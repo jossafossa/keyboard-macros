@@ -1,13 +1,17 @@
 import { connect } from "./connect";
-import { getMacros, onDeviceKeyPress, sendNotification } from "./helpers";
+import {
+  getMacros,
+  onDeviceKeyPress,
+  playJolke,
+  sendNotification,
+} from "./helpers";
 import { showText } from "./helpers/showText/showText";
 import { createTimerManager } from "./timer";
-import { existsSync } from "node:fs";
 
-const DEVICE_PATH = process.env.DEVICE_PATH;
-const DEVICE_NAME = process.env.DEVICE_NAME;
+const DEVICE_VENDOR_ID = process.env.DEVICE_VENDOR_ID;
+const DEVICE_PRODUCT_ID = process.env.DEVICE_PRODUCT_ID;
 
-if (!DEVICE_PATH || !DEVICE_NAME) {
+if (!DEVICE_VENDOR_ID || !DEVICE_PRODUCT_ID) {
   throw new Error(
     "❌ Failed to retrieve device configuration from environment variables. Please run `bun run setup` first.",
   );
@@ -16,8 +20,8 @@ if (!DEVICE_PATH || !DEVICE_NAME) {
 const TIMER_MACROS = getMacros();
 const NR_OF_MACROS = Object.keys(TIMER_MACROS).length;
 
-const device = connect(DEVICE_PATH);
-console.log("✅ Connected to device at path:", DEVICE_PATH);
+const device = connect(DEVICE_VENDOR_ID, DEVICE_PRODUCT_ID);
+console.log("✅ Connected to", device.getDeviceInfo().product);
 console.log(`✅ Loaded ${NR_OF_MACROS} timer macros from configuration`);
 console.table(TIMER_MACROS);
 
@@ -46,6 +50,12 @@ const SPECIAL_MACROS = new Map<string, () => void>([
       showText(JSON.stringify(getSessions(), null, 2));
     },
   ],
+  [
+    "9",
+    () => {
+      playJolke();
+    },
+  ],
 ]);
 
 const { start, stop, getSessions } = createTimerManager();
@@ -53,8 +63,10 @@ const { start, stop, getSessions } = createTimerManager();
 onDeviceKeyPress(device, (character: string) => {
   const timerMacro = TIMER_MACROS.get(character);
   if (timerMacro) {
-    fireTimerMacro(timerMacro);
+    fireTimerMacro(timerMacro.value);
   }
 
-  SPECIAL_MACROS.get(character)?.();
+  const specialMacro = SPECIAL_MACROS.get(character);
+  console.log(specialMacro);
+  specialMacro?.();
 });

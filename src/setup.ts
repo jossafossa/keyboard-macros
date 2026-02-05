@@ -1,6 +1,9 @@
 import HID from "node-hid";
 import { writeFileSync, existsSync, copyFileSync } from "node:fs";
 
+// is --debug flag enabled
+const isDebug = process.argv.includes("--debug") || process.argv.includes("-d");
+
 async function setupDevice() {
   console.log("🔍 Searching for USB devices...");
 
@@ -20,6 +23,7 @@ async function setupDevice() {
   }
 
   console.log("\nAvailable devices:");
+  isDebug && console.log(filteredDevices);
   filteredDevices.forEach((d, i) => {
     console.log(
       `[${i}] ${d.manufacturer} - ${d.product} (ID: ${d.vendorId}:${d.productId})`,

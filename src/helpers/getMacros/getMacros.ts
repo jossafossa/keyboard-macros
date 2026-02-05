@@ -1,5 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 
+type MacroValue = {
+  type: "timer";
+  value: string;
+};
+
 export const getMacros = () => {
   if (!existsSync("macros.json")) {
     throw new Error(
@@ -7,7 +12,7 @@ export const getMacros = () => {
     );
   }
 
-  let macrosConfig: Record<string, string>;
+  let macrosConfig: Record<string, MacroValue>;
   try {
     macrosConfig = JSON.parse(readFileSync("macros.json", "utf-8"));
   } catch (error) {
