@@ -1,0 +1,15 @@
+{
+  "useOnlyOneTimer": false,
+  "macros": {
+    "1": {
+      "type": "timer",
+      "value": "stuff",
+      "character": "🔴"
+    },
+    "2": {
+      "type": "timer",
+      "value": "other stuff",
+      "character": "🟡"
+    }
+  }
+}

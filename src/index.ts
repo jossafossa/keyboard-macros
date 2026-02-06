@@ -1,72 +1,107 @@
 import { connect } from "./connect";
 import {
-  getMacros,
+  getSettings,
+  getTimerOverview,
   onDeviceKeyPress,
   playJolke,
   sendNotification,
 } from "./helpers";
+import { getAccumulatedTime } from "./helpers/getAccumulatedTime/getAccumulatedTime";
 import { showText } from "./helpers/showText/showText";
-import { createTimerManager } from "./timer";
+import { timer } from "./timer";
 
-const DEVICE_VENDOR_ID = process.env.DEVICE_VENDOR_ID;
-const DEVICE_PRODUCT_ID = process.env.DEVICE_PRODUCT_ID;
+const init = () => {
+  const DEVICE_VENDOR_ID = process.env.DEVICE_VENDOR_ID;
+  const DEVICE_PRODUCT_ID = process.env.DEVICE_PRODUCT_ID;
 
-if (!DEVICE_VENDOR_ID || !DEVICE_PRODUCT_ID) {
-  throw new Error(
-    "❌ Failed to retrieve device configuration from environment variables. Please run `bun run setup` first.",
-  );
-}
-
-const TIMER_MACROS = getMacros();
-const NR_OF_MACROS = Object.keys(TIMER_MACROS).length;
-
-const device = connect(DEVICE_VENDOR_ID, DEVICE_PRODUCT_ID);
-console.log("✅ Connected to", device.getDeviceInfo().product);
-console.log(`✅ Loaded ${NR_OF_MACROS} timer macros from configuration`);
-console.table(TIMER_MACROS);
-
-const fireTimerMacro = (macro: string) => {
-  const sessions = getSessions();
-
-  const activeSession = sessions.find(
-    (session) => session.id === macro && !session.endTime,
-  );
-
-  if (activeSession) {
-    stop(macro);
-    sendNotification(`Stopped macro: ${macro}`);
+  if (!DEVICE_VENDOR_ID || !DEVICE_PRODUCT_ID) {
+    throw new Error(
+      "❌ Failed to retrieve device configuration from environment variables. Please run `bun run setup` first.",
+    );
   }
-  if (!activeSession) {
-    start(macro);
-    sendNotification(`Started macro: ${macro}`);
-  }
+
+  const SETTINGS = getSettings();
+  const TIMER_MACROS = SETTINGS.macros;
+  const NR_OF_MACROS = Object.keys(TIMER_MACROS).length;
+
+  const device = connect(DEVICE_VENDOR_ID, DEVICE_PRODUCT_ID);
+  console.log("✅ Connected to", device.getDeviceInfo().product);
+  console.log(`✅ Loaded ${NR_OF_MACROS} timer macros from configuration`);
+  console.table(TIMER_MACROS);
+
+  const fireTimerMacro = (macro: string) => {
+    const sessions = getSessions();
+
+    const activeSession = sessions.find(
+      (session) => session.id === macro && !session.endTime,
+    );
+
+    if (activeSession) {
+      stop(macro);
+      sendNotification(getTimerOverview(), "Timer Stopped");
+    }
+    if (!activeSession) {
+      if (SETTINGS.useOnlyOneTimer) {
+        sessions.forEach((session) => {
+          if (!session.endTime) {
+            stop(session.id);
+          }
+        });
+      }
+
+      start(macro);
+      sendNotification(getTimerOverview(), "Timer Started");
+    }
+  };
+
+  const SPECIAL_MACROS = new Map<string, () => void>([
+    [
+      "Enter",
+      () => {
+        const accumulatedTime = getAccumulatedTime();
+        const prettyAccumulatedTime = Object.entries(accumulatedTime)
+          .map(([id, time]) => `${id}: ${time}`)
+          .join("\n");
+
+        console.table(accumulatedTime);
+        console.table(getSessions());
+        showText(prettyAccumulatedTime);
+      },
+    ],
+    [
+      "9",
+      () => {
+        playJolke();
+      },
+    ],
+    [
+      "0",
+      () => {
+        sendNotification(getTimerOverview(), "Timer overview");
+      },
+    ],
+  ]);
+
+  const { start, stop, getSessions } = timer;
+
+  onDeviceKeyPress(device, (character: string) => {
+    const timerMacro = TIMER_MACROS[character];
+
+    console.log(timerMacro);
+
+    if (timerMacro) {
+      fireTimerMacro(timerMacro.value);
+    }
+
+    const specialMacro = SPECIAL_MACROS.get(character);
+    specialMacro?.();
+  });
 };
 
-const SPECIAL_MACROS = new Map<string, () => void>([
-  [
-    "Enter",
-    () => {
-      console.table(getSessions());
-      showText(JSON.stringify(getSessions(), null, 2));
-    },
-  ],
-  [
-    "9",
-    () => {
-      playJolke();
-    },
-  ],
-]);
-
-const { start, stop, getSessions } = createTimerManager();
-
-onDeviceKeyPress(device, (character: string) => {
-  const timerMacro = TIMER_MACROS.get(character);
-  if (timerMacro) {
-    fireTimerMacro(timerMacro.value);
+(() => {
+  try {
+    init();
+  } catch (error) {
+    console.log(error);
   }
-
-  const specialMacro = SPECIAL_MACROS.get(character);
-  console.log(specialMacro);
-  specialMacro?.();
-});
+})();

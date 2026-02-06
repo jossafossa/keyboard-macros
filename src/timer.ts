@@ -40,3 +40,5 @@ export const createTimerManager = () => {
     getSessions,
   };
 };
+
+export const timer = createTimerManager();

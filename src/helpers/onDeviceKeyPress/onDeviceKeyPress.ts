@@ -6,11 +6,12 @@ export const onDeviceKeyPress = (
   callback: (character: string) => void,
 ) => {
   device.on("data", (data: Buffer) => {
-    const keyCode = data[3];
-
-    const character = keyCodeToChar(keyCode);
+    const character = [data[4], data[3]]
+      .map((code) => keyCodeToChar(code))
+      .find(Boolean);
 
     if (!character) return;
+
     callback(character);
   });
 };
