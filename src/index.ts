@@ -7,8 +7,7 @@ import {
   sendNotification,
 } from "./helpers";
 import { getAccumulatedTime } from "./helpers/getAccumulatedTime/getAccumulatedTime";
-import { showText } from "./helpers/showText/showText";
-import { timer } from "./timer";
+import { showText, timer } from "./helpers";
 
 const init = () => {
   const DEVICE_VENDOR_ID = process.env.DEVICE_VENDOR_ID;
@@ -30,7 +29,7 @@ const init = () => {
   console.table(TIMER_MACROS);
 
   const fireTimerMacro = (macro: string) => {
-    const sessions = getSessions();
+    const sessions = timer.getSessions();
 
     const activeSession = sessions.find(
       (session) => session.id === macro && !session.endTime,
@@ -80,14 +79,19 @@ const init = () => {
         sendNotification(getTimerOverview(), "Timer overview");
       },
     ],
+    [
+      "-",
+      () => {
+        timer.clearSessions();
+        sendNotification("All timers cleared");
+      },
+    ],
   ]);
 
   const { start, stop, getSessions } = timer;
 
   onDeviceKeyPress(device, (character: string) => {
     const timerMacro = TIMER_MACROS[character];
-
-    console.log(timerMacro);
 
     if (timerMacro) {
       fireTimerMacro(timerMacro.value);
