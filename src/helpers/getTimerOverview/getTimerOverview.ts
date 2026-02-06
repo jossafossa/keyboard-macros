@@ -1,4 +1,4 @@
-import { timer } from "../../timer";
+import { timer } from "../timer";
 import { getSettings } from "../getSettings";
 
 /*

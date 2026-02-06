@@ -7,3 +7,5 @@ export * from "./playJolke";
 export * from "./getAccumulatedTime";
 export * from "./secondsToHours";
 export * from "./getTimerOverview";
+export * from "./Store";
+export * from "./timer";

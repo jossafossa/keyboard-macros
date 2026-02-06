@@ -1,4 +1,4 @@
-import { timer } from "../../timer";
+import { timer } from "../timer";
 import { secondsToHours } from "../secondsToHours";
 
 type AccumulatedTime = Record<string, string>;
