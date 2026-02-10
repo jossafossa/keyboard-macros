@@ -2,3 +2,5 @@
 settings.json
 node_modules/
 .cache/
+logs/
+.macros.pid

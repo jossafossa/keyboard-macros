@@ -1,5 +1,12 @@
 import HID from "node-hid";
-import { writeFileSync, existsSync, copyFileSync } from "node:fs";
+import {
+  writeFileSync,
+  existsSync,
+  copyFileSync,
+  readFileSync,
+  appendFileSync,
+} from "node:fs";
+import { homedir } from "node:os";
 
 // is --debug flag enabled
 const isDebug = process.argv.includes("--debug") || process.argv.includes("-d");
@@ -51,10 +58,9 @@ async function setupDevice() {
 }
 
 function setupMacros() {
-  if (!existsSync("macros.json")) {
+  if (!existsSync("settings.json")) {
     console.log("📝 Creating default macros.json configuration...");
-    // copy from macros.example.json to macros.json
-    copyFileSync("macros.example.json", "macros.json");
+    copyFileSync("settings.example.json", "settings.json");
 
     console.log(
       "✅ Created macros.json! Edit this file to customize your timer macros.",
@@ -66,12 +72,66 @@ function setupMacros() {
   }
 }
 
+async function setupAutostart() {
+  const zshrcPath = `${homedir()}/.zshrc`;
+  const macrosPath = process.cwd();
+
+  // Check if autostart is already configured
+  if (existsSync(zshrcPath)) {
+    const zshrcContent = readFileSync(zshrcPath, "utf-8");
+    if (zshrcContent.includes("MACROS_PID_FILE")) {
+      console.log("✅ Autostart is already configured in your .zshrc");
+      return;
+    }
+  }
+
+  console.log("\n🚀 Would you like to enable automatic startup?");
+  console.log(
+    "   This will start the macros app automatically when you open a new terminal.",
+  );
+  process.stdout.write("Enable autostart? (y/N): ");
+
+  // Set up stdin to read user input
+  process.stdin.setEncoding("utf-8");
+
+  const choice = await new Promise<string>((resolve) => {
+    process.stdin.once("data", (data) => {
+      resolve(data.toString().trim());
+    });
+  });
+
+  if (choice.toLowerCase() === "y" || choice.toLowerCase() === "yes") {
+    const autostartCode = `
+# Macros auto-start
+MACROS_PID_FILE="${macrosPath}/.macros.pid"
+if ! ([[ -f "$MACROS_PID_FILE" ]] && kill -0 "$(cat "$MACROS_PID_FILE")" 2>/dev/null); then
+  rm -f "$MACROS_PID_FILE"
+  (cd ${macrosPath} && bun --env-file=.env run start >> ./logs/macros.log 2>&1 & echo $! > "$MACROS_PID_FILE")
+  echo "🚀 Started macros background process (PID: $(cat "$MACROS_PID_FILE"))"
+fi
+`;
+
+    appendFileSync(zshrcPath, autostartCode);
+
+    console.log("✅ Added autostart to your .zshrc");
+    console.log(`📁 Logs will be saved to: ${macrosPath}/logs/macros.log`);
+    console.log(`🛑 To stop manually: kill $(cat ${macrosPath}/.macros.pid)`);
+  } else {
+    console.log("⏭️  Skipped autostart configuration");
+  }
+
+  // Clean up stdin
+  process.stdin.pause();
+}
+
 async function setup() {
   console.log("🚀 Setting up your macros application...\n");
 
   await setupDevice();
 
   setupMacros();
+
+  await setupAutostart();
 
   console.log(
     "\n🎉 Setup complete! Run 'bun start' to begin using your macros.",
