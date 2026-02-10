@@ -1,15 +1,30 @@
 {
-  "useOnlyOneTimer": false,
+  "useOnlyOneTimer": true,
   "macros": {
     "1": {
       "type": "timer",
-      "value": "stuff",
+      "value": "Project Development",
       "character": "🔴"
     },
     "2": {
       "type": "timer",
-      "value": "other stuff",
+      "value": "Client Work",
       "character": "🟡"
+    },
+    "3": {
+      "type": "soundEffect"
+    },
+    "4": {
+      "type": "overview"
+    },
+    "5": {
+      "type": "clearAll"
+    },
+    "6": {
+      "type": "stopAll"
+    },
+    "7": {
+      "type": "showAll"
     }
   }
 }

@@ -2,8 +2,10 @@ import { connect } from "./connect";
 import {
   getSettings,
   getTimerOverview,
+  Macro,
   playSoundEffect,
   sendNotification,
+  TimerMacro,
 } from "./helpers";
 import { getAccumulatedTime } from "./helpers/getAccumulatedTime/getAccumulatedTime";
 import { showText, timer } from "./helpers";
@@ -17,6 +19,38 @@ const init = () => {
       "❌ Failed to retrieve device configuration from environment variables. Please run `bun run setup` first.",
     );
   }
+
+  const fireAction = (macro: Macro) => {
+    switch (macro.type) {
+      case "timer":
+        fireTimerMacro(macro.value);
+        break;
+      case "soundEffect":
+        playSoundEffect();
+        break;
+      case "overview":
+        sendNotification(getTimerOverview(), "Timer overview");
+        break;
+      case "clearAll":
+        timer.clearSessions();
+        sendNotification("All timers cleared");
+        break;
+      case "stopAll":
+        timer.stopAllTimers();
+        sendNotification("All timers stopped");
+        break;
+      case "showAll":
+        const accumulatedTime = getAccumulatedTime();
+        const prettyAccumulatedTime = Object.entries(accumulatedTime)
+          .map(([id, time]) => `${id}: ${time}`)
+          .join("\n");
+
+        console.table(accumulatedTime);
+        console.table(timer.getSessions());
+        showText(prettyAccumulatedTime);
+        break;
+    }
+  };
 
   const SETTINGS = getSettings();
   const TIMER_MACROS = SETTINGS.macros;
@@ -33,14 +67,12 @@ const init = () => {
       sendNotification("Device disconnected");
     },
     onKeyPress: (character: string) => {
-      const timerMacro = TIMER_MACROS[character];
+      const customMacro = TIMER_MACROS[character];
 
-      if (timerMacro) {
-        fireTimerMacro(timerMacro.value);
+      if (customMacro) {
+        fireAction(customMacro);
+        return;
       }
-
-      const specialMacro = SPECIAL_MACROS.get(character);
-      specialMacro?.();
     },
   });
 
@@ -69,49 +101,7 @@ const init = () => {
     }
   };
 
-  const SPECIAL_MACROS = new Map<string, () => void>([
-    [
-      "Enter",
-      () => {
-        const accumulatedTime = getAccumulatedTime();
-        const prettyAccumulatedTime = Object.entries(accumulatedTime)
-          .map(([id, time]) => `${id}: ${time}`)
-          .join("\n");
-
-        console.table(accumulatedTime);
-        console.table(getSessions());
-        showText(prettyAccumulatedTime);
-      },
-    ],
-    [
-      "9",
-      () => {
-        playSoundEffect();
-      },
-    ],
-    [
-      "0",
-      () => {
-        sendNotification(getTimerOverview(), "Timer overview");
-      },
-    ],
-    [
-      "-",
-      () => {
-        timer.clearSessions();
-        sendNotification("All timers cleared");
-      },
-    ],
-    [
-      "=",
-      () => {
-        timer.stopAllTimers();
-        sendNotification("All timers stopped");
-      },
-    ],
-  ]);
-
-  const { start, stop, getSessions } = timer;
+  const { start, stop } = timer;
 };
 
 init();

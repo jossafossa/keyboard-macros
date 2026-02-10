@@ -14,6 +14,7 @@ export const StoreHandler = () => {
       );
       return data;
     } catch {
+      console.error(`❌ Failed to read cache for key: ${key}`);
       return null;
     }
   };

@@ -60,5 +60,5 @@ export const getTimerOverview = (): string => {
     )
     .join("\n");
 
-  return grid;
+  return `${grid}\n⏱️ ${activeTimerValues.join(", ") || "None"}`;
 };

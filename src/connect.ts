@@ -52,6 +52,7 @@ export const connect = (
         onConnect?.();
         console.log("✅ Device connected successfully");
       } catch (error) {
+        console.log("❌ Failed to connect to device. Retrying in 1 second...");
         attemptConnection();
       }
     }, 1000);

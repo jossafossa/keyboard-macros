@@ -1,7 +1,7 @@
 import Audic from "audic";
 import { readdirSync } from "fs";
 
-const soundBytes = readdirSync("sound-effects").map(
+const soundBytes = readdirSync("sound-effects/").map(
   (file) => new Audic(`sound-effects/${file}`),
 );
 

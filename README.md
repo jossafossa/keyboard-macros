@@ -52,6 +52,21 @@ ps aux | grep bun | grep macros
 kill $(cat ./.macros.pid)
 ```
 
+## Action Types
+
+The application supports several action types that can be configured in your `settings.json` file:
+
+### Available Action Types
+
+| Type | Description | Configuration |
+|------|-------------|--------------|
+| `timer` | Start/stop specific project timers | Requires `value` field with timer description and `character` field for emoji icon. |
+| `soundEffect` | Play random sound effects | - |
+| `overview` | Show timer overview notification | - |
+| `clearAll` | Clear all timer sessions | - |
+| `stopAll` | Stop all currently running timers | - |
+| `showAll` | Display all active sessions and accumulated time | - |
+
 ## Customizing Macros
 
 Edit the `settings.json` file to customize your timer macros:
@@ -71,49 +86,43 @@ Edit the `settings.json` file to customize your timer macros:
       "character": "🟡"
     },
     "3": {
-      "type": "timer",
-      "value": "Bug Fixes",
-      "character": "🟢"
+      "type": "soundEffect"
     },
     "4": {
-      "type": "timer",
-      "value": "Meetings & Admin",
-      "character": "🔵"
+      "type": "overview"
     },
     "5": {
-      "type": "timer",
-      "value": "Other Tasks",
-      "character": "⚪️"
+      "type": "clearAll"
     },
     "6": {
-      "type": "timer",
-      "value": "Code Review",
-      "character": "🟣"
+      "type": "stopAll"
     },
     "7": {
-      "type": "timer",
-      "value": "Research",
-      "character": "🟤"
+      "type": "showAll"
     }
   }
 }
 ```
 
+### Configuration Options
+
 - **useOnlyOneTimer**: Set to `true` to stop other timers when starting a new one
-- **type**: Always `"timer"` for timer macros
-- **value**: Description of the timer/project
-- **character**: Emoji icon to display
+- **type**: The action type (see table above)
+- **value**: Description of the timer/project (required for `timer` type)
+- **character**: Emoji icon to display (optional)
 
-The key corresponds to the button press, and the value is your timer description.
+The key corresponds to the button press on your device.
 
-## Special Commands
+## Action Behavior
 
-- **Enter**: View all active sessions and accumulated time (opens in text file)
-- **Number keys (1-8)**: Start/stop specific project timers  
-- **9**: Play random sound effect
-- **0**: Show timer overview notification
-- **-** (Minus): Clear all timer sessions
-- **=** (Equals): Stop all currently running timers
+The behavior of each action type when triggered:
+
+- **timer**: Toggles the specified timer (starts if stopped, stops if running). If `useOnlyOneTimer` is enabled, stops all other timers first.
+- **soundEffect**: Plays a random sound effect from the sound-effects directory
+- **overview**: Displays a notification showing the current status of all timers
+- **clearAll**: Clears all timer sessions and shows a confirmation notification
+- **stopAll**: Stops all currently running timers and shows a confirmation notification
+- **showAll**: Shows accumulated time in console table format and opens a text display with the summary
 
 ## File Structure
 

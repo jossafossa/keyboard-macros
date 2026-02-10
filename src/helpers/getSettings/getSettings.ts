@@ -1,15 +1,42 @@
 import { existsSync, readFileSync } from "node:fs";
 
+export type TimerMacro = {
+  type: "timer";
+  value: string;
+  character: string;
+};
+
+export type SoundMacro = {
+  type: "soundEffect";
+};
+
+export type OverviewMacro = {
+  type: "overview";
+};
+
+export type ClearAllMacro = {
+  type: "clearAll";
+};
+
+export type StopAllMacro = {
+  type: "stopAll";
+};
+
+export type ShowAllMacro = {
+  type: "showAll";
+};
+
+export type Macro =
+  | TimerMacro
+  | SoundMacro
+  | OverviewMacro
+  | ClearAllMacro
+  | StopAllMacro
+  | ShowAllMacro;
+
 type Settings = {
   useOnlyOneTimer: boolean;
-  macros: Record<
-    string,
-    {
-      type: "timer";
-      value: string;
-      character: string;
-    }
-  >;
+  macros: Record<string, Macro>;
 };
 
 export const getSettings = () => {
