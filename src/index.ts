@@ -23,7 +23,14 @@ const init = () => {
   const TIMER_MACROS = SETTINGS.macros;
   const NR_OF_MACROS = Object.keys(TIMER_MACROS).length;
 
-  const device = connect(DEVICE_VENDOR_ID, DEVICE_PRODUCT_ID);
+  const device = connect(DEVICE_VENDOR_ID, DEVICE_PRODUCT_ID, {
+    onConnect: () => {
+      sendNotification("Device connected");
+    },
+    onDisconnect: () => {
+      sendNotification("Device disconnected");
+    },
+  });
   console.log("✅ Connected to", device.getDeviceInfo().product);
   console.log(`✅ Loaded ${NR_OF_MACROS} timer macros from configuration`);
   console.table(TIMER_MACROS);
@@ -86,6 +93,13 @@ const init = () => {
         sendNotification("All timers cleared");
       },
     ],
+    [
+      "=",
+      () => {
+        timer.stopAllTimers();
+        sendNotification("All timers stopped");
+      },
+    ],
   ]);
 
   const { start, stop, getSessions } = timer;
@@ -102,10 +116,4 @@ const init = () => {
   });
 };
 
-(() => {
-  try {
-    init();
-  } catch (error) {
-    console.log(error);
-  }
-})();
+init();

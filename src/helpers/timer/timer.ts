@@ -56,11 +56,19 @@ export const createTimerManager = () => {
     sessions = [];
     store.set(TIMER_CACHE_KEY, sessions);
   };
+
+  const stopAllTimers = () => {
+    sessions.map((session) => {
+      stop(session.id);
+    });
+  };
+
   return {
     start,
     stop,
     getSessions,
     clearSessions,
+    stopAllTimers,
   };
 };
 
