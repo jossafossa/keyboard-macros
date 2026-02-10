@@ -2,7 +2,6 @@ import { connect } from "./connect";
 import {
   getSettings,
   getTimerOverview,
-  onDeviceKeyPress,
   playJolke,
   sendNotification,
 } from "./helpers";
@@ -25,15 +24,25 @@ const init = () => {
 
   const device = connect(DEVICE_VENDOR_ID, DEVICE_PRODUCT_ID, {
     onConnect: () => {
+      console.log("✅ Connected to", device.getDeviceInfo().product);
+      console.log(`✅ Loaded ${NR_OF_MACROS} timer macros from configuration`);
+      console.table(TIMER_MACROS);
       sendNotification("Device connected");
     },
     onDisconnect: () => {
       sendNotification("Device disconnected");
     },
+    onKeyPress: (character: string) => {
+      const timerMacro = TIMER_MACROS[character];
+
+      if (timerMacro) {
+        fireTimerMacro(timerMacro.value);
+      }
+
+      const specialMacro = SPECIAL_MACROS.get(character);
+      specialMacro?.();
+    },
   });
-  console.log("✅ Connected to", device.getDeviceInfo().product);
-  console.log(`✅ Loaded ${NR_OF_MACROS} timer macros from configuration`);
-  console.table(TIMER_MACROS);
 
   const fireTimerMacro = (macro: string) => {
     const sessions = timer.getSessions();
@@ -103,17 +112,6 @@ const init = () => {
   ]);
 
   const { start, stop, getSessions } = timer;
-
-  onDeviceKeyPress(device, (character: string) => {
-    const timerMacro = TIMER_MACROS[character];
-
-    if (timerMacro) {
-      fireTimerMacro(timerMacro.value);
-    }
-
-    const specialMacro = SPECIAL_MACROS.get(character);
-    specialMacro?.();
-  });
 };
 
 init();
