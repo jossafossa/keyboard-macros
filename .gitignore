@@ -2,5 +2,6 @@
 settings.json
 node_modules/
 .cache/
-logs/
+logs/*
 .macros.pid
+sound-effects/*

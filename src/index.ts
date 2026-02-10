@@ -2,7 +2,7 @@ import { connect } from "./connect";
 import {
   getSettings,
   getTimerOverview,
-  playJolke,
+  playSoundEffect,
   sendNotification,
 } from "./helpers";
 import { getAccumulatedTime } from "./helpers/getAccumulatedTime/getAccumulatedTime";
@@ -86,7 +86,7 @@ const init = () => {
     [
       "9",
       () => {
-        playJolke();
+        playSoundEffect();
       },
     ],
     [

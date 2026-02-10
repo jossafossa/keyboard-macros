@@ -3,7 +3,7 @@ export * from "./onDeviceKeyPress";
 export * from "./sendNotification";
 export * from "./showText";
 export * from "./getSettings";
-export * from "./playJolke";
+export * from "./playSoundEffect";
 export * from "./getAccumulatedTime";
 export * from "./secondsToHours";
 export * from "./getTimerOverview";
