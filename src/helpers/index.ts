@@ -5,7 +5,7 @@ export * from "./showText";
 export * from "./getSettings";
 export * from "./playSoundEffect";
 export * from "./getAccumulatedTime";
-export * from "./getOverview";
+export * from "./getTimerSummary";
 export * from "./secondsToHours";
 export * from "./getTimerOverview";
 export * from "./Store";

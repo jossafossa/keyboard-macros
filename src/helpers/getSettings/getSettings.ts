@@ -22,8 +22,8 @@ export type StopAllMacro = {
   type: "stopAll";
 };
 
-export type ShowAllMacro = {
-  type: "showAll";
+export type SummaryMacro = {
+  type: "summary";
 };
 
 export type Macro =
@@ -32,7 +32,7 @@ export type Macro =
   | OverviewMacro
   | ClearAllMacro
   | StopAllMacro
-  | ShowAllMacro;
+  | SummaryMacro;
 
 type Settings = {
   useOnlyOneTimer: boolean;

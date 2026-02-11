@@ -1,6 +1,6 @@
 import { connect } from "./connect";
 import {
-  getOverview,
+  getTimerSummary,
   getSettings,
   getTimerOverview,
   Macro,
@@ -41,9 +41,8 @@ const init = () => {
         timer.stopAllTimers();
         sendNotification("All timers stopped");
         break;
-      case "showAll":
-        const overview = getOverview();
-        console.log(overview);
+      case "summary":
+        const overview = getTimerSummary();
         showPopup("Accumulated Time", overview);
         break;
     }

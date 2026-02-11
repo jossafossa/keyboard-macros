@@ -7,7 +7,7 @@ example output:
 🟢 Meetings: 1.5
 🔴 Project Development: 3.2
 */
-export const getOverview = (): string => {
+export const getTimerSummary = (): string => {
   const accumulatedTime = getAccumulatedTime();
   const { macros } = getSettings();
 
@@ -22,8 +22,6 @@ export const getOverview = (): string => {
       );
     }
   }
-
-  console.log("Final lines:", lines);
 
   return lines.join("\n");
 };

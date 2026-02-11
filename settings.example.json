@@ -14,17 +14,17 @@
     "*": {
       "type": "soundEffect"
     },
-    "0": {
-      "type": "overview"
-    },
     "-": {
       "type": "clearAll"
     },
     "=": {
       "type": "stopAll"
     },
+    "Enter": {
+      "type": "summary"
+    },
     ".": {
-      "type": "showAll"
+      "type": "overview"
     }
   }
 }

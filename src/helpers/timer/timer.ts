@@ -8,6 +8,8 @@ type TimerSession = {
 
 const TIMER_CACHE_KEY = "timerSessions";
 
+const getDateString = (date: Date) => date.toISOString();
+
 const getTimersFromCache = (): TimerSession[] => {
   const store = StoreHandler();
   const timers = store.get(TIMER_CACHE_KEY) || [];
@@ -53,6 +55,8 @@ export const createTimerManager = () => {
   const getSessions = () => [...sessions];
 
   const clearSessions = () => {
+    store.set(`${TIMER_CACHE_KEY}_${getDateString(new Date())}`, sessions);
+
     sessions = [];
     store.set(TIMER_CACHE_KEY, sessions);
   };

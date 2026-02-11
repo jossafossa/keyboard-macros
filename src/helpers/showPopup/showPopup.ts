@@ -3,7 +3,7 @@ import { spawn } from "bun";
 export const showPopup = async (
   title: string,
   message: string,
-  timeoutSeconds = 10,
+  timeoutSeconds?: number,
 ) => {
   const safeMessage = message.replace(/"/g, '\\"');
   const safeTitle = title.replace(/"/g, '\\"');
@@ -13,7 +13,8 @@ export const showPopup = async (
     with title "${safeTitle}" ¬
     buttons {"OK"} ¬
     default button "OK" ¬
-    giving up after ${timeoutSeconds}
+    ${timeoutSeconds ? `giving up after ${timeoutSeconds} seconds` : ""}
+
   `;
 
   await spawn(["osascript", "-e", appleScript]);
