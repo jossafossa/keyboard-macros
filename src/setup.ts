@@ -79,7 +79,7 @@ async function setupAutostart() {
   // Check if autostart is already configured
   if (existsSync(zshrcPath)) {
     const zshrcContent = readFileSync(zshrcPath, "utf-8");
-    if (zshrcContent.includes("MACROS_PID_FILE")) {
+    if (zshrcContent.includes("MACROS_SCRIPT_PATH")) {
       console.log("✅ Autostart is already configured in your .zshrc");
       return;
     }
@@ -102,13 +102,12 @@ async function setupAutostart() {
 
   if (choice.toLowerCase() === "y" || choice.toLowerCase() === "yes") {
     const autostartCode = `
+
 # Macros auto-start
 MACROS_PID_FILE="${macrosPath}/.macros.pid"
-if ! ([[ -f "$MACROS_PID_FILE" ]] && kill -0 "$(cat "$MACROS_PID_FILE")" 2>/dev/null); then
-  rm -f "$MACROS_PID_FILE"
-  (cd ${macrosPath} && bun --env-file=.env run start >> ./logs/macros.log 2>&1 & echo $! > "$MACROS_PID_FILE")
-  echo "🚀 Started macros background process (PID: $(cat "$MACROS_PID_FILE"))"
-fi
+MACROS_SCRIPT_PATH="${macrosPath}/src/index.ts"
+
+bun "$MACROS_SCRIPT_PATH" > /dev/null 2>&1 & echo $! > $MACROS_PID_FILE
 `;
 
     appendFileSync(zshrcPath, autostartCode);

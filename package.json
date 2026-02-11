@@ -8,6 +8,7 @@
   },
   "scripts": {
     "setup": "bun run ./src/setup.ts",
-    "start": "bun run ./src/index.ts"
+    "start": "bun run ./src/index.ts",
+    "stop": "pkill -f \"$PWD/src/index.ts\" || true"
   }
 }

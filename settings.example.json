@@ -11,19 +11,19 @@
       "value": "Client Work",
       "character": "🟡"
     },
-    "3": {
+    "*": {
       "type": "soundEffect"
     },
-    "4": {
+    "0": {
       "type": "overview"
     },
-    "5": {
+    "-": {
       "type": "clearAll"
     },
-    "6": {
+    "=": {
       "type": "stopAll"
     },
-    "7": {
+    "Enter": {
       "type": "showAll"
     }
   }

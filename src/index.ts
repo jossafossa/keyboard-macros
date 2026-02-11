@@ -1,10 +1,12 @@
 import { connect } from "./connect";
 import {
+  getOverview,
   getSettings,
   getTimerOverview,
   Macro,
   playSoundEffect,
   sendNotification,
+  showPopup,
   TimerMacro,
 } from "./helpers";
 import { getAccumulatedTime } from "./helpers/getAccumulatedTime/getAccumulatedTime";
@@ -40,14 +42,9 @@ const init = () => {
         sendNotification("All timers stopped");
         break;
       case "showAll":
-        const accumulatedTime = getAccumulatedTime();
-        const prettyAccumulatedTime = Object.entries(accumulatedTime)
-          .map(([id, time]) => `${id}: ${time}`)
-          .join("\n");
-
-        console.table(accumulatedTime);
-        console.table(timer.getSessions());
-        showText(prettyAccumulatedTime);
+        const overview = getOverview();
+        console.log(overview);
+        showPopup("Accumulated Time", overview);
         break;
     }
   };

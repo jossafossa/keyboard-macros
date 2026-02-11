@@ -1,8 +1,15 @@
 import { timer } from "../timer";
-import { secondsToHours } from "../secondsToHours";
 
-type AccumulatedTime = Record<string, string>;
+type AccumulatedTime = Record<string, number>;
 
+/*
+Returns accumulated time per timer ID in seconds
+example:
+{
+  "timer1": 5400,  // 1.5 hours in seconds
+  "timer2": 11520  // 3.2 hours in seconds  
+}
+*/
 export const getAccumulatedTime = (): AccumulatedTime => {
   const sessions = timer.getSessions();
   const accumulated: Record<string, number> = {};
@@ -15,11 +22,5 @@ export const getAccumulatedTime = (): AccumulatedTime => {
     }
   });
 
-  // Convert accumulated time to "hours:minutes" format
-  const formattedAccumulated: AccumulatedTime = {};
-  for (const id in accumulated) {
-    formattedAccumulated[id] = secondsToHours(accumulated[id]);
-  }
-
-  return formattedAccumulated;
+  return accumulated;
 };
